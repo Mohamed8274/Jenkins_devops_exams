@@ -64,7 +64,7 @@ pipeline {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
                         docker.image(DOCKER_IMAGE).push()
                         // Additional tag for 'latest'
-                        docker.image(DOCKER_IMAGE).push('latest')
+                        // docker.image(DOCKER_IMAGE).push('latest')
                     }
                 }
             }
