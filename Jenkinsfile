@@ -5,7 +5,7 @@
  *
  * Key Features:
  * - Centralized environment variable management.
- * - Reusable function for Docker build and push with error handling.
+ * - Reusable function for Docker build and push with robust error handling.
  * - Credential management using Jenkins' built-in `withCredentials` for PATs.
  * - Explicit Docker Hub authentication validation using PAT.
  * - Placeholder for Kubernetes deployment and smoke tests.
@@ -19,17 +19,21 @@
 
 /**
  * Builds a Docker image for a given service and pushes it to the configured Docker registry.
+ * This function assumes a prior `docker login` has been successfully executed in the pipeline.
  * Includes robust error handling for build and push operations.
  *
  * @param serviceName The name of the microservice (e.g., 'movie-service', 'cast-service').
- * This maps to the subdirectory containing the Dockerfile.
+ * This maps to the subdirectory containing the Dockerfile. The service name will also be
+ * used as the repository name under the DOCKER_HUB_ID (e.g., tdksoft/movie-service).
  * @param buildTag The unique tag for the image (e.g., Git commit hash, build number).
  * @throws Exception if Docker build or push fails.
  */
 def buildAndPushServiceImage(serviceName, buildTag) {
-    // Construct the full image name: <DockerHubID>/<DockerRepo>-<Service>-<Tag>
-    // Example: "tdksoft/jenkins-devops-exams-movie-service:123-abcde"
-    def imageFullName = "${env.DOCKER_HUB_ID}/${env.DOCKER_REPO}-${serviceName}:${buildTag}"
+    // Construct the full image name: <DockerHubID>/<serviceName>:<buildTag>
+    // Example: "tdksoft/movie-service:123-abcde"
+    // Ensure serviceName is lowercase as Docker repository names are typically lowercase.
+    def repositoryName = serviceName.toLowerCase()
+    def imageFullName = "${env.DOCKER_HUB_ID}/${repositoryName}:${buildTag}"
     
     // Path to the service's Dockerfile relative to the workspace root
     def dockerfilePath = "${serviceName}/Dockerfile"
@@ -38,20 +42,23 @@ def buildAndPushServiceImage(serviceName, buildTag) {
         echo "🚀 Attempting to build Docker image for '${serviceName}' with tag '${buildTag}'..."
         
         // Execute the Docker build command.
+        // The '.' at the end sets the build context to the workspace root,
+        // allowing COPY commands in the Dockerfile to reference files relative to the root.
         // Docker build uses the previously logged-in session.
         docker.build(imageFullName, "-f ${dockerfilePath} .")
         echo "✅ Docker image for '${serviceName}' built successfully: ${imageFullName}"
 
         echo "📦 Initiating push of Docker image '${imageFullName}' to registry..."
         
-        // Push the uniquely tagged image. This also uses the pre-established login.
+        // Push the uniquely tagged image. This relies on the pre-established login.
         docker.image(imageFullName).push()
         echo "✅ Image ${imageFullName} pushed."
 
-        // Also push with a 'latest' tag for the specific service for easy access
-        // This creates a tag like "tdksoft/jenkins-devops-exams-movie-service:latest"
-        docker.image(imageFullName).push("${env.DOCKER_REPO}-${serviceName}:latest")
-        echo "✅ Image ${serviceName}:latest also pushed."
+        // Also push with a 'latest' tag for this specific service.
+        // This creates a tag like "tdksoft/movie-service:latest"
+        def latestTagFullName = "${env.DOCKER_HUB_ID}/${repositoryName}:latest"
+        docker.image(imageFullName).push(latestTagFullName) // Push with the full 'latest' tag name
+        echo "✅ Image ${latestTagFullName} also pushed."
         
         echo "🎉 Successfully pushed all tags for '${serviceName}'."
 
@@ -75,7 +82,6 @@ pipeline {
     environment {
         // Docker Registry Configuration
         DOCKER_HUB_ID = "tdksoft"                                // Your Docker Hub username or organization
-        DOCKER_REPO = "jenkins-devops-exams"                     // Base repository name on Docker Hub
         DOCKER_HUB_PAT_CREDENTIAL_ID = 'docker-hub-pat'          // Jenkins Credential ID for Docker Hub PAT (Secret Text)
 
         // Kubernetes Configuration (placeholder for now)
@@ -96,9 +102,9 @@ pipeline {
     options {
         // Set a timeout for the entire pipeline to prevent hanging builds.
         timeout(time: 30, unit: 'MINUTES')
-        // Optional: retry(2) // Automatic retry in case of temporary failure
-        // Optional: disableConcurrentBuilds() // Prevents concurrent builds from interfering
-        // Optional: buildDiscarder(logRotator(numToKeepStr: '30')) // Keep last 30 build logs
+        // retry(2) // Optional: Automatic retry in case of temporary failure
+        // disableConcurrentBuilds() // Optional: Prevents concurrent builds from interfering
+        // buildDiscarder(logRotator(numToKeepStr: '30')) // Optional: Keep last 30 build logs
     }
 
     // =============================================================================================
@@ -111,7 +117,6 @@ pipeline {
         // ---------------------
         stage('Checkout Source Code') {
             steps {
-                // Checkout the SCM repository (e.g., Git) defined in the job configuration.
                 script {
                     echo "🔍 Checking out source code..."
                     checkout scm
@@ -122,7 +127,7 @@ pipeline {
 
         // ---------------------
         // 2. Pre-checks: Validate Docker Hub Access
-        // This stage now explicitly logs in using the PAT (Secret Text credential).
+        // This stage explicitly logs in using the PAT (Secret Text credential).
         // ---------------------
         stage("Validate Docker Hub Access") {
             steps {
@@ -135,10 +140,10 @@ pipeline {
                             sh """
                                 echo "${DOCKER_PAT}" | docker login -u ${env.DOCKER_HUB_ID} --password-stdin
                             """
-                            // Attempt a pull of a known image (or one from your repo, suppressing errors)
-                            // This verifies read access. Write access is implicitly tested during push.
+                            // Attempt a pull of a known image (e.g., alpine) to verify read access.
+                            // Suppress errors with '|| true' as the image might not exist locally or remotely.
                             sh """
-                                docker pull ${env.DOCKER_HUB_ID}/${env.DOCKER_REPO}:latest || true
+                                docker pull busybox:latest || true
                             """
                             echo "✅ Successfully logged in and verified Docker Hub access using PAT."
                         } catch (Exception err) {
@@ -181,6 +186,7 @@ pipeline {
                     
                     // The following section is commented out as it requires a Kubeconfig file
                     // and a working Kubernetes cluster setup.
+                    // You would typically use withKubeConfig or writeFile to use the credential.
                     
                     /*
                     withCredentials([file(credentialsId: env.KUBECONFIG_CREDENTIAL_ID, variable: 'KUBECONFIG_PATH')]) {
@@ -191,7 +197,7 @@ pipeline {
                         echo "Deploying ${env.MOVIE_SERVICE_NAME}..."
                         // Replace placeholders in k8s manifests with actual image tags
                         sh """
-                            export MOVIE_IMAGE_TAG="${env.DOCKER_HUB_ID}/${env.DOCKER_REPO}-${env.MOVIE_SERVICE_NAME}:${env.BUILD_TAG}"
+                            export MOVIE_IMAGE_TAG="${env.DOCKER_HUB_ID}/${env.MOVIE_SERVICE_NAME.toLowerCase()}:${env.BUILD_TAG}"
                             envsubst < k8s/${env.MOVIE_SERVICE_NAME}/deployment.yaml | kubectl apply -f -
                             echo "Waiting for ${env.MOVIE_SERVICE_NAME} deployment rollout..."
                             kubectl rollout status deployment/${env.MOVIE_SERVICE_NAME} --timeout=300s
@@ -201,7 +207,7 @@ pipeline {
                         // --- Deploy Cast Service ---
                         echo "Deploying ${env.CAST_SERVICE_NAME}..."
                         sh """
-                            export CAST_IMAGE_TAG="${env.DOCKER_HUB_ID}/${env.DOCKER_REPO}-${env.CAST_SERVICE_NAME}:${env.BUILD_TAG}"
+                            export CAST_IMAGE_TAG="${env.DOCKER_HUB_ID}/${env.CAST_SERVICE_NAME.toLowerCase()}:${env.BUILD_TAG}"
                             envsubst < k8s/${env.CAST_SERVICE_NAME}/deployment.yaml | kubectl apply -f -
                             echo "Waiting for ${env.CAST_SERVICE_NAME} deployment rollout..."
                             kubectl rollout status deployment/${env.CAST_SERVICE_NAME} --timeout=300s
@@ -290,8 +296,8 @@ pipeline {
             script {
                 echo "Attempting to roll back Kubernetes deployment..."
                 // Example rollback for a single deployment, adjust for multiple services
-                sh "kubectl rollout undo deployment/${env.MOVIE_SERVICE_NAME} || true"
-                sh "kubectl rollout undo deployment/${env.CAST_SERVICE_NAME} || true"
+                sh "kubectl rollout undo deployment/${env.MOVIE_SERVICE_NAME.toLowerCase()} || true"
+                sh "kubectl rollout undo deployment/${env.CAST_SERVICE_NAME.toLowerCase()} || true"
                 echo "Rollback initiated (if applicable)."
             }
             */
