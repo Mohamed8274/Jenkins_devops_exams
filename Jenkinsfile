@@ -32,12 +32,9 @@ def buildAndPushServiceImage(serviceName, buildTag) {
     // Ensure serviceName is lowercase as Docker repository names are typically lowercase.
     def repositoryName = serviceName.toLowerCase()
     
-    // Original image tag: e.g., tdksoft/movie-service:15-1d8c0c6
+    // Full image name with the specific build tag: e.g., tdksoft/movie-service:16-5e7b8bd
     def imageFullName = "${env.DOCKER_HUB_ID}/${repositoryName}:${buildTag}"
     
-    // Full image name for the 'latest' tag: e.g., tdksoft/movie-service:latest
-    def latestImageFullName = "${env.DOCKER_HUB_ID}/${repositoryName}:latest"
-
     // Path to the service's Dockerfile relative to the workspace root
     def dockerfilePath = "${serviceName}/Dockerfile"
 
@@ -45,21 +42,23 @@ def buildAndPushServiceImage(serviceName, buildTag) {
         echo "🚀 Attempting to build Docker image for '${serviceName}' with tag '${buildTag}'..."
         
         // Execute the Docker build command.
-        // This will create the image with the specific build tag (e.g., :15-1d8c0c6)
+        // This will create the image with the specific build tag.
         docker.build(imageFullName, "-f ${dockerfilePath} .")
         echo "✅ Docker image for '${serviceName}' built successfully: ${imageFullName}"
 
         echo "📦 Initiating push of Docker image '${imageFullName}' to registry..."
         
-        // Push the uniquely tagged image (e.g., tdksoft/movie-service:15-1d8c0c6)
+        // Push the uniquely tagged image (e.g., tdksoft/movie-service:16-5e7b8bd)
+        // This will push the image that was just built and tagged.
         docker.image(imageFullName).push()
         echo "✅ Image ${imageFullName} pushed."
 
         // Now, push the *same image* with the 'latest' tag.
-        // The docker.image() object refers to the image built.
-        // We then push it *again* to the 'latest' fully qualified name.
-        docker.image(imageFullName).push(latestImageFullName) // THIS IS THE CORRECTED LINE
-        echo "✅ Image ${latestImageFullName} also pushed."
+        // The docker.image() object represents the image that was just built/tagged.
+        // When you pass just a string like 'latest' to .push(), it means "push THIS image
+        // to its repository with the tag 'latest'". This is the simplest and correct way.
+        docker.image(imageFullName).push('latest') // THIS IS THE SIMPLIFIED AND CORRECTED LINE
+        echo "✅ Image ${env.DOCKER_HUB_ID}/${repositoryName}:latest also pushed." // Echo the expected name
         
         echo "🎉 Successfully pushed all tags for '${serviceName}'."
 
