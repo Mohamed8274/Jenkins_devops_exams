@@ -58,11 +58,7 @@ def buildAndPushServiceImage(serviceName, buildTag) {
         }
         echo "🎉 Successfully pushed all tags for '${serviceName}'."
 
-    } catch (DockerAccessException e) {
-        // Catch specific Docker-related exceptions from the plugin
-        error("❌ Docker operation failed for service '${serviceName}': ${e.message}")
     } catch (Exception e) {
-        // Catch any other unexpected errors during build or push
         error("💥 An unexpected error occurred during build/push for service '${serviceName}': ${e.message}")
     }
 }
