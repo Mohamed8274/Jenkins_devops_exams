@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres_movie-configmap-{{ .Release.Namespace }}
+  name: postgres-movie-configmap-{{ .Release.Namespace }}
   labels:
     app: movie-{{ .Release.Namespace }}
 data:

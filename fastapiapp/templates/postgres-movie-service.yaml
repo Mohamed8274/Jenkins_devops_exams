@@ -1,14 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cast_db-{{ .Release.Namespace }}
+  name: movie-db-{{ .Release.Namespace }}
   labels:
-    app: cast-{{ .Release.Namespace }}
+    app: movie-{{ .Release.Namespace }}
 spec:
   type: ClusterIP
   selector:
-    app: postgres_cast-{{ .Release.Namespace }}
+    app: postgres-movie-{{ .Release.Namespace }}
   ports:
   - port: 5432
     targetPort: 5432
     protocol: TCP
+

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-movie-{{ .Release.Namespace }}
+  labels:
+    app: movie-{{ .Release.Namespace }}
+spec:
+  serviceName: movie-db-{{ .Release.Namespace }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-movie-{{ .Release.Namespace }}
+  template:
+    metadata:
+      labels:
+        app: postgres-movie-{{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: postgres-movie-{{ .Release.Namespace }}
+        image: postgres:12.1-alpine
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: postgres-movie-configmap-{{ .Release.Namespace }}
+        - secretRef:
+            name: postgres-movie-secret-{{ .Release.Namespace }}
+        volumeMounts:
+        - name: postgres-data-movie
+          mountPath: /var/lib/postgresql/data/
+      volumes:
+      - name: postgres-data-movie
+        persistentVolumeClaim:
+          claimName: postgres-movie-pvc-{{ .Release.Namespace }}

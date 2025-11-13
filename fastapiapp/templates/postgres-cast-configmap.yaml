@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres_cast-configmap-{{ .Release.Namespace }}
+  name: postgres-cast-configmap-{{ .Release.Namespace }}
   labels:
     app: cast-{{ .Release.Namespace }}
 data:

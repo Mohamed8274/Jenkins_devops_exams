@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres_movie-pvc-{{ .Release.Namespace }}
+  name: postgres-movie-pvc-{{ .Release.Namespace }}
   labels:
     app: movie-{{ .Release.Namespace }}
 spec:

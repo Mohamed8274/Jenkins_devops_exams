@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres_cast-pvc-{{ .Release.Namespace }}
+  name: postgres-cast-pvc-{{ .Release.Namespace }}
   labels:
     app: cast-{{ .Release.Namespace }}
 spec:
