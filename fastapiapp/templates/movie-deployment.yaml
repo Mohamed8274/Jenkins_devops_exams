@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-deployment-{{ .Release.Namespace }}
+  labels: 
+    app: movie-{{ .Release.Namespace }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: movie-deployment-{{ .Release.Namespace }}
+  template:
+    metadata:
+      labels:
+        app: movie-deployment-{{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: movie
+        image: "{{ .Values.image.movie.repository }}:{{ .Values.image.movie.tag }}" 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        envFrom:
+          - configMapRef:
+              name: movie-configmap-{{ .Release.Namespace }}
+        volumeMounts:
+          - name: movie-volume-{{ .Release.Namespace }}
+            mountPath: /app/data
+      volumes:
+        - name: movie-volume-{{ .Release.Namespace }}
+          persistentVolumeClaim:
+            claimName: movie-pvc-{{ .Release.Namespace }}
+

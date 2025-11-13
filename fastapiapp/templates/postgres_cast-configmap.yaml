@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres_cast-configmap-{{ .Release.Namespace }}
+  labels:
+    app: cast-{{ .Release.Namespace }}
+data:
+  POSTGRES_USER: cast_db_username
+  POSTGRES_DB: cast_db_dev

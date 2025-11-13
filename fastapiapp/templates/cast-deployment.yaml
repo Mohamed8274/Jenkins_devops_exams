@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-deployment-{{ .Release.Namespace }}
+  labels: 
+    app: cast-{{ .Release.Namespace }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: cast-deployment-{{ .Release.Namespace }}
+  template:
+    metadata:
+      labels:
+        app: cast-deployment-{{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: cast
+        image: "{{ .Values.image.cast.repository }}:{{ .Values.image.cast.tag }}" 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        envFrom:
+          - configMapRef:
+              name: cast-configmap-{{ .Release.Namespace }}
+        volumeMounts:
+          - name: cast-volume-{{ .Release.Namespace }}
+            mountPath: /app/data
+      volumes:
+        - name: cast-volume-{{ .Release.Namespace }}
+          persistentVolumeClaim:
+            claimName: cast-pvc-{{ .Release.Namespace }}
+

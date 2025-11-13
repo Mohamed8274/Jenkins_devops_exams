@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-{{ .Release.Namespace }}
+  labels: 
+    app: nginx-{{ .Release.Namespace }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: nginx-deployment-{{ .Release.Namespace }}
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment-{{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+          protocol: TCP
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/conf.d
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-configmap-{{ .Release.Namespace }}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-service-{{ .Release.Namespace }}
+  labels:
+    app: movie-{{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: movie-deployment-{{ .Release.Namespace }}
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

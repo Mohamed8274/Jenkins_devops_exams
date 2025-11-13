@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-service-{{ .Release.Namespace }}
+  labels:
+    app: cast-{{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: cast-deployment-{{ .Release.Namespace }}
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres_movie-configmap-{{ .Release.Namespace }}
+  labels:
+    app: movie-{{ .Release.Namespace }}
+data:
+  POSTGRES_USER: movie_db_username
+  POSTGRES_DB: movie_db_dev
+
