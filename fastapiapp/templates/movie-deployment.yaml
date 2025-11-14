@@ -26,6 +26,8 @@ spec:
         envFrom:
           - configMapRef:
               name: movie-configmap-{{ .Release.Namespace }}
+          - secretRef:
+              name: movie-secret-{{ .Release.Namespace }}
         volumeMounts:
           - name: movie-volume-{{ .Release.Namespace }}
             mountPath: /app/data
