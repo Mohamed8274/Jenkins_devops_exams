@@ -1,3 +1,24 @@
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: nginx-configmap-{{ .Release.Namespace }}
+#   labels:
+#     app: nginx-{{ .Release.Namespace }}
+# data:
+#   default.conf: |
+#     server {
+#       listen 8081;
+
+#       location /api/v1/movies {
+#         proxy_pass http://movie_service:8000/api/v1/movies;
+#       }
+
+#       location /api/v1/casts {
+#         proxy_pass http://cast_service:8000/api/v1/casts;
+#       }
+
+#     }
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,14 +28,13 @@ metadata:
 data:
   default.conf: |
     server {
-      listen 8080;
+      listen 8081;
 
       location /api/v1/movies {
-        proxy_pass http://movie_service:8000/api/v1/movies;
+        proxy_pass http://movie-service-{{ .Release.Namespace }}:8000/api/v1/movies;
       }
 
       location /api/v1/casts {
-        proxy_pass http://cast_service:8000/api/v1/casts;
+        proxy_pass http://cast-service-{{ .Release.Namespace }}:8000/api/v1/casts;
       }
-
     }

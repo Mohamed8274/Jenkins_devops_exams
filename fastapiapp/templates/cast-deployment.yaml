@@ -23,9 +23,6 @@ spec:
         ports:
         - containerPort: 8000
           protocol: TCP
-        envFrom:
-          - configMapRef:
-              name: cast-configmap-{{ .Release.Namespace }}
         volumeMounts:
           - name: cast-volume-{{ .Release.Namespace }}
             mountPath: /app/data
