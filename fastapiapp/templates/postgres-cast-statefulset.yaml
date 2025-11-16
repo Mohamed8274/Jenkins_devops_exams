@@ -33,3 +33,4 @@ spec:
       - name: postgres-data-cast
         persistentVolumeClaim:
           claimName: postgres-cast-pvc-{{ .Release.Namespace }}
+
