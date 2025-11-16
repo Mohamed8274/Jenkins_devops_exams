@@ -19,6 +19,8 @@ spec:
       containers:
       - name: movie
         image: "{{ .Values.image.movie.repository }}:{{ .Values.image.movie.tag }}" 
+        command: ["uvicorn", "app.main:app"]
+        args: ["--host", "0.0.0.0", "--port", "8000"]
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
