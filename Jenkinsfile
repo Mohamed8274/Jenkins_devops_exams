@@ -64,7 +64,7 @@ stages {
         steps {
           script {
           sh '''
-          curl http://movie_service:8000/api/v1/movies
+          curl http://localhost:8000/api/v1/movies
           '''
           // curl http://localhost:8000/api/v1/movies/ curl localhost
           }
@@ -74,7 +74,7 @@ stages {
         steps {
           script {
           sh '''
-          http://cast_service:8000/api/v1/casts
+          http://localhost:8000/api/v1/casts
           '''
           }
         }
