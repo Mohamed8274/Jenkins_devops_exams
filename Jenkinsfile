@@ -64,7 +64,8 @@ stages {
         steps {
           script {
           sh '''
-          curl http://localhost:8000/api/v1/movies
+          kubectl port-forward svc/movie-svc 8000:8000
+          curl http://localhost:8000/api/v1/movies/
           '''
           // curl http://localhost:8000/api/v1/movies/ curl localhost
           }
@@ -74,7 +75,8 @@ stages {
         steps {
           script {
           sh '''
-          http://localhost:8000/api/v1/casts
+          kubectl port-forward svc/movie-svc 8001:8000
+          curl http://localhost:8001/api/v1/cast/
           '''
           }
         }
