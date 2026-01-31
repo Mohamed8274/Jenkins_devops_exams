@@ -74,7 +74,7 @@ stages {
         steps {
           script {
           sh '''
-          curl http://localhost:9001/api/v1/cast/
+          curl http://localhost:9000/api/v1/cast/
           '''
           }
         }
