@@ -5,10 +5,6 @@ DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build 
 DOCKER_IMAGE_MOVIE = "movie-service"
 DOCKER_IMAGE_CAST = "cast-service"
 KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-NODEPORT_DEV = 30001
-NODEPORT_STAGING = 30002
-NODEPORT_PROD = 30003
-NODEPORT_QA = 30004
 }
 agent any // Jenkins will be able to select all available agents
 stages {
@@ -68,9 +64,9 @@ stages {
         steps {
           script {
           sh '''
-          curl localhost
+          curl http://movie_service:8000/api/v1/movies
           '''
-          // curl http://localhost:8000/api/v1/movies/
+          // curl http://localhost:8000/api/v1/movies/ curl localhost
           }
         }
       }
@@ -78,7 +74,7 @@ stages {
         steps {
           script {
           sh '''
-          curl localhost
+          http://cast_service:8000/api/v1/casts
           '''
           }
         }
@@ -123,7 +119,7 @@ stages {
       cp fastapiapp/values.yaml values.yml
       cat values.yml
       sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-      helm upgrade --install fastapp fastapiapp --values=values.yml --namespace dev --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG" --set service.nodePort="$NODEPORT_DEV"
+      helm upgrade --install fastapp fastapiapp --values=values.yml --namespace dev --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG"
       '''
       }
     }
@@ -139,7 +135,7 @@ stages {
       cp fastapiapp/values.yaml values.yml
       cat values.yml
       sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-      helm upgrade --install fastapp fastapiapp --values=values.yml --namespace qa --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG" --set service.nodePort="$NODEPORT_QA"
+      helm upgrade --install fastapp fastapiapp --values=values.yml --namespace qa --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG"
       '''
       }
     }
@@ -155,7 +151,7 @@ stages {
       cp fastapiapp/values.yaml values.yml
       cat values.yml
       sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-      helm upgrade --install fastapp fastapiapp --values=values.yml --namespace staging --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG" --set service.nodePort="$NODEPORT_STAGING"
+      helm upgrade --install fastapp fastapiapp --values=values.yml --namespace staging --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG"
       '''
       }
     }
@@ -176,7 +172,7 @@ stages {
         cp fastapiapp/values.yaml values.yml
         cat values.yml
         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-        helm upgrade --install fastapp fastapiapp --values=values.yml --namespace prod --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG" --set service.nodePort="$NODEPORT_PROD"
+        helm upgrade --install fastapp fastapiapp --values=values.yml --namespace prod --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG"
         '''
       }
     }
