@@ -33,8 +33,7 @@ spec:
         volumeMounts:
           - name: movie-volume-{{ .Release.Namespace }}
             mountPath: /app/data
-      volumes:
-        - name: movie-volume-{{ .Release.Namespace }}
-          persistentVolumeClaim:
-            claimName: movie-pvc-{{ .Release.Namespace }}
-
+      # volumes:
+      #   - name: movie-volume-{{ .Release.Namespace }}
+      #     persistentVolumeClaim:
+      #       claimName: movie-pvc-{{ .Release.Namespace }}

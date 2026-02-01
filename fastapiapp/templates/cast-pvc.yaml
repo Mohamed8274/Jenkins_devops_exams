@@ -1,13 +1,13 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: cast-pvc-{{ .Release.Namespace }}
-  labels:
-    app: cast-{{ .Release.Namespace }}
-spec:
-  storageClassName: local-path
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: cast-pvc-{{ .Release.Namespace }}
+#   labels:
+#     app: cast-{{ .Release.Namespace }}
+# spec:
+#   storageClassName: local-path
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi
