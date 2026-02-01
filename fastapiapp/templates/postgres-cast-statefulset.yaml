@@ -27,11 +27,11 @@ spec:
         - secretRef:
             name: postgres-cast-secret-{{ .Release.Namespace }}
         volumeMounts:
-        - name: postgres-data-cast
+        - name: postgres-data-cast-{{ .Release.Namespace }}
           mountPath: /var/lib/postgresql/data/
       volumes:
-      - name: postgres-data-cast
-        emptyDir: {}
-        # persistentVolumeClaim:
-        #   claimName: postgres-cast-pvc-{{ .Release.Namespace }}
+      - name: postgres-data-cast-{{ .Release.Namespace }}
+        # emptyDir: {}
+        persistentVolumeClaim:
+          claimName: postgres-cast-pvc-{{ .Release.Namespace }}
 

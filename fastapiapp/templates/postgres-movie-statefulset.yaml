@@ -27,10 +27,10 @@ spec:
         - secretRef:
             name: postgres-movie-secret-{{ .Release.Namespace }}
         volumeMounts:
-        - name: postgres-data-movie
+        - name: postgres-data-movie-{{ .Release.Namespace }}
           mountPath: /var/lib/postgresql/data/
       volumes:
-      - name: postgres-data-movie
-        emptyDir: {}
-        # persistentVolumeClaim:
-        #   claimName: postgres-movie-pvc-{{ .Release.Namespace }}
+      - name: postgres-data-movie-{{ .Release.Namespace }}
+        # emptyDir: {}
+        persistentVolumeClaim:
+          claimName: postgres-movie-pvc-{{ .Release.Namespace }}

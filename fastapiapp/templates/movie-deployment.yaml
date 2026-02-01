@@ -30,10 +30,10 @@ spec:
               name: movie-configmap-{{ .Release.Namespace }}
           - secretRef:
               name: movie-secret-{{ .Release.Namespace }}
-        # volumeMounts:
-        #   - name: movie-volume-{{ .Release.Namespace }}
-        #     mountPath: /app/data
-      volumes: []
-      #   - name: movie-volume-{{ .Release.Namespace }}
-      #     persistentVolumeClaim:
-      #       claimName: movie-pvc-{{ .Release.Namespace }}
+        volumeMounts:
+          - name: movie-volume-{{ .Release.Namespace }}
+            mountPath: /app/data
+      volumes: #[]
+        - name: movie-volume-{{ .Release.Namespace }}
+          persistentVolumeClaim:
+            claimName: movie-pvc-{{ .Release.Namespace }}
