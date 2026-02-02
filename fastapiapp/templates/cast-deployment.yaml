@@ -33,6 +33,5 @@ spec:
             mountPath: /app/data
       volumes: # []
         - name: cast-volume-{{ .Release.Namespace }}
-          emptyDir: {}
-          # persistentVolumeClaim:
-          #   claimName: cast-pvc-{{ .Release.Namespace }}
+          persistentVolumeClaim:
+            claimName: cast-pvc-{{ .Release.Namespace }}
