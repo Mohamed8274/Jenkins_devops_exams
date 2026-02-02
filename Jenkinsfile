@@ -40,19 +40,19 @@ stages {
         steps {
           script {
           sh '''
-          docker run -d -p 8001:8000 --name movie-service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
+          docker run -d -p 8001:8000 --name movie-service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
           sleep 10
-          '''
-          }
+          '''// docker run -d -p 8001:8000 --name movie-service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
+          } 
         }
       }
       stage('Docker run cast-service'){
         steps {
           script {
           sh '''
-          docker run -d -p 8002:8000 --name cast-service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
+          docker run -d -p 8002:8000 --name cast-service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
           sleep 10
-          '''
+          ''' // docker run -d -p 8002:8000 --name cast-service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
           }
         }
       }
