@@ -40,7 +40,7 @@ stages {
         steps {
           script {
           sh '''
-          docker run -d -p 8001:8000 --name movie-service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
+          docker run -d -p 8001:8000 --name movie-service -e DATABASE_URI="postgresql://movie_db_username:movie_db_password@localhost:5432/movie_db_dev" $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
           sleep 10
           '''// docker run -d -p 8001:8000 --name movie-service $DOCKER_ID/$DOCKER_IMAGE_MOVIE:$DOCKER_TAG
           } 
@@ -50,7 +50,7 @@ stages {
         steps {
           script {
           sh '''
-          docker run -d -p 8002:8000 --name cast-service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
+          docker run -d -p 8002:8000 --name cast-service -e DATABASE_URI="postgresql://cast_db_username:cast_db_password@localhost:5432/cast_db_dev" $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG uvicorn app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
           sleep 10
           ''' // docker run -d -p 8002:8000 --name cast-service $DOCKER_ID/$DOCKER_IMAGE_CAST:$DOCKER_TAG
           }
