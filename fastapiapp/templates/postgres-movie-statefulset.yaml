@@ -33,4 +33,3 @@ spec:
       - name: postgres-data-movie-{{ .Release.Namespace }}
         persistentVolumeClaim:
           claimName: postgres-movie-pvc-{{ .Release.Namespace }}
-        # emptyDir: {}
