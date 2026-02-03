@@ -28,7 +28,7 @@ metadata:
 data:
   default.conf: |
     server {
-      listen 8081;
+      listen 8080;
 
       location /api/v1/movies/ {
         proxy_pass http://movie-service-{{ .Release.Namespace }}:8000/;
