@@ -30,13 +30,10 @@ podSecurityContext: {}
 
 securityContext: {}
 
-# service:
-#   type: ClusterIP
-#   port: 8000
-#   nodePort: null
-
 service:
-  nodeport: null
+  # type: ClusterIP
+  # port: 8000
+  nodePort: ""
 
 
 ingress:
