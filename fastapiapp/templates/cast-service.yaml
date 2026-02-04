@@ -10,5 +10,6 @@ spec:
     app: cast-deployment-{{ .Release.Namespace }}
   ports:
     - protocol: TCP
-      port: 8000
+      port: 8002
       targetPort: 8000
+      # nodePort: {{ .Values.service.nodePort }}
