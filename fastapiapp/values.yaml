@@ -31,7 +31,7 @@ podSecurityContext: {}
 securityContext: {}
 
 service:
-  type: ClusterIP
+  # type: ClusterIP
   # port: 8000
   nodePort: null
 
