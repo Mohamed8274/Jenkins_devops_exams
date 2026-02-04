@@ -176,7 +176,7 @@ stages {
         cp fastapiapp/values.yaml values.yml
         cat values.yml
         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-        helm upgrade --install fastapp fastapiapp --values=values.yml --namespace prod --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG" --set service.nodePort="$NODEPORT_PROD"
+        helm upgrade --install fastapp fastapiapp --values=values.yml --namespace prod --set image.movie.repository="$DOCKER_ID/$DOCKER_IMAGE_MOVIE" --set image.cast.repository="$DOCKER_ID/$DOCKER_IMAGE_CAST" --set image.movie.tag="$DOCKER_TAG" --set image.cast.tag="$DOCKER_TAG" --set service.type=NodePort --set service.nodePort="$NODEPORT_PROD"
         '''
       }
     }
