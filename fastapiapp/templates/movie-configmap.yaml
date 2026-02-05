@@ -6,3 +6,4 @@ metadata:
     app: movie-{{ .Release.Namespace }}
 data:
   CAST_SERVICE_HOST_URL: http://cast_service:8000/api/v1/casts/
+  DATABASE_URI: postgresql://movie_db_username:movie_db_password@movie_db/movie_db_dev

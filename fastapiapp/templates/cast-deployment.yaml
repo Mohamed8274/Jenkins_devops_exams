@@ -19,15 +19,17 @@ spec:
       containers:
       - name: cast
         image: "{{ .Values.image.cast.repository }}:{{ .Values.image.cast.tag }}" 
-        command: ["uvicorn", "app.main:app"]
-        args: ["--host", "0.0.0.0", "--port", "8000", "--loop", "asyncio"]
+        command: ["sh", "-c"] # ["uvicorn", "app.main:app"]
+        args: ["uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"] # ["--host", "0.0.0.0", "--port", "8000", "--loop", "asyncio"]
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
           protocol: TCP
         envFrom:
-          - secretRef:
-              name: cast-secret-{{ .Release.Namespace }}
+          - configMapRef:
+              name: cast-configmap-{{ .Release.Namespace }}
+          # - secretRef:
+          #     name: cast-secret-{{ .Release.Namespace }}
         volumeMounts:
           - name: cast-volume-{{ .Release.Namespace }}
             mountPath: /app/data
