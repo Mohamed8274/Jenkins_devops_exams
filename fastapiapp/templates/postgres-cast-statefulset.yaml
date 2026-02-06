@@ -33,4 +33,3 @@ spec:
       - name: postgres-data-cast-{{ .Release.Namespace }}
         persistentVolumeClaim:
           claimName: postgres-cast-pvc-{{ .Release.Namespace }}
-        # emptyDir: {}

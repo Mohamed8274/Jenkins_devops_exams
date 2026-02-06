@@ -1,8 +1,0 @@
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: cast-configmap-{{ .Release.Namespace }}
-#   labels:
-#     app: cast-{{ .Release.Namespace }}
-# data:
-#   DATABASE_URI : postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev
