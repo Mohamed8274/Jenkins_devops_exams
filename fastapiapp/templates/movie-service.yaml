@@ -10,5 +10,5 @@ spec:
     app: movie-deployment-{{ .Release.Namespace }}
   ports:
     - protocol: TCP
-      port: 8001
+      port: 8000
       targetPort: 8000
